@@ -148,12 +148,22 @@ Xin=rbind(X,X)
 GDin=cbind(as.data.frame(taxa),Xin)
 str=c(rep(1,length(taxav)),rep(0,length(taxav)))
 CVin=cbind(as.data.frame(taxa),str)
-
+# for BLINK in the GAPIT
 fwrite(myGM2,"inbred.GM.txt",row.names=F,quote=FALSE,col.names=T)
 fwrite(CVin,"inbred.CV.txt",row.names=F,quote=FALSE,col.names=T)
 rm(X,Xin)
 rm(myGD2)
 fwrite(GDin,"inbred.GD.txt",row.names=F,quote=FALSE,col.names=T)
+
+# for BLINK-c 
+inbredY=read.table("inbred.Y.txt",head=T)
+inbredY[is.na(inbredY)]="NaN"
+
+fwrite(myGM2,"inbred.map",sep=" ",quote=F,col.names=T,row.names=F)
+fwrite(inbredY,"inbred.txt",sep=" ",quote=F,col.names=T,row.names=F)
+fwrite(CVin,"inbred.cov",sep=" ",quote=F,col.names=T,row.names=F)
+blink_GD=t(GDin[,-1])
+fwrite(blink_GD,"inbred.dat",quote=F,sep=" ",col.names=F,row.names=F)
 
 # hybrid genotype
 rm(list=ls())
@@ -161,10 +171,16 @@ setwd("/home/jiabowang/data/Lanjuan_Rice/hapmap")
 
 myGD1=data.table::fread("565.GD.txt",header=T)
 myGM1=read.table("565.GM.txt",sep=",",head=T)
+myY=read.table("hybrid.Y.txt",head=T)
+cv=read.csv("GAPIT1.PCA.csv") # it is in this repository
+
 library(data.table)
 taxav=paste("TC_",as.character(as.matrix(as.data.frame(myGD1[,1]))),sep="")
 taxagc=paste("HMP_",as.character(as.matrix(as.data.frame(myGD1[,1]))),sep="")
 taxa=c(taxav,taxagc)
+newcv=cbind(as.data.frame(taxa),rbind(cv[,7:10],cv[,7:10]))
+blink_Y=myY
+blink_Y[is.na(blink_Y)]="NaN"
 
 SNP=as.character(myGM1[,1])
 chr=as.numeric(myGM1[,2])
@@ -177,12 +193,13 @@ str=c(rep(1,length(taxav)),rep(0,length(taxav)))
 CVhy=cbind(as.data.frame(taxa),str)
 GMhy=cbind(as.data.frame(SNPin),chrin,Posin)
 
-
+# for BLINK in the GAPIT
 rm(X,myGD1)
 rm(Xhy1,Xhy2,Xhy)
 fwrite(GMhy,"hybrid.GM.txt",row.names=F,quote=FALSE,col.names=T)
 fwrite(CVhy,"hybrid.CV.txt",row.names=F,quote=FALSE,col.names=T)
-rm(GMhy,CVhy)
+blink_CV=cbind(CVhy,newcv[,-1])
+# for BLINK-c
 
 rm(list=ls())
 setwd("/home/jiabowang/data/Lanjuan_Rice/hapmap")
@@ -197,9 +214,17 @@ Xhy1=cbind(X,abs(abs(X-1)-1))
 Xhy2=cbind(X*0,abs(abs(X-1)-1))
 Xhy=rbind(Xhy1,Xhy2)
 GDhy=cbind(as.data.frame(taxa),Xhy)
+fwrite(GDhy,"hybrid.GD.txt",row.names=F,quote=FALSE,col.names=T)
+
 blink_GD=t(GDhy[,-1])
 setwd("/home/jiabowang/data/Lanjuan_Rice/Phenotype")
 fwrite(blink_GD,"hybrid.dat",quote=F,sep=" ",col.names=F,row.names=F)
+blink_Y=myY
+blink_Y[is.na(blink_Y)]="NaN"
+
+fwrite(GMhy,"hybrid.map",sep=" ",quote=F,col.names=T,row.names=F)
+fwrite(blink_Y,"hybrid.txt",sep=" ",quote=F,col.names=T,row.names=F)
+fwrite(blink_CV,"hybrid.cov",sep=" ",quote=F,col.names=T,row.names=F)
 
 # Combin genotype
 rm(list=ls())
