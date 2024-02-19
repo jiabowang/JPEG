@@ -78,8 +78,14 @@ setwd("/home/jiabowang/data/Lanjuan_Rice/Phenotype")
 myY1=read.table("V.traits.txt",head=T)
 myY2=read.table("GC.traits.txt",head=T)
 
-taxav=paste("V_",as.character(myY1[,1]),sep="")
-taxagc=paste("GC_",as.character(myY2[,1]),sep="")
+myGD2=data.table::fread("118.GD.txt",header=T)
+myGM2=read.table("118.GM.txt",sep=",",head=T)
+library(data.table)
+taxav=paste("V_",as.character(as.matrix(as.data.frame(myGD2[,1]))),sep="")
+taxagc=paste("GC_",as.character(as.matrix(as.data.frame(myGD2[,1]))),sep="")
+
+X=as.matrix(myGD2[,-1])
+
 taxall=append(taxav,taxagc)
 y0=myY1[,-1]
 y1=myY2[,-1]
@@ -89,6 +95,8 @@ y11=apply(y1,2,function(one) (one-mean(one,na.rm=T))/sqrt(var(one,na.rm=T)))
 y3=rbind(y00,y11)
 inbredY=cbind(as.data.frame(taxall),y3)
 write.table(inbredY,"inbred.Y.txt",quote=F,row.names=F)
+
+
 #hybrid phenotype
 setwd("/home/jiabowang/data/Lanjuan_Rice/Phenotype")
 myY1=read.table("TC.traits.txt",head=T)
@@ -105,6 +113,7 @@ y11=apply(y1,2,function(one) (one-mean(one,na.rm=T))/sqrt(var(one,na.rm=T)))
 y3=rbind(y00,y11)
 hybridY=cbind(as.data.frame(taxall),y3)
 write.table(hybridY,"hybrid.Y.txt",quote=F,row.names=F)
+
 #combind phenotype
 setwd("/home/jiabowang/data/Lanjuan_Rice/Phenotype")
 myY1=read.table("inbred.Y.txt",head=T)
